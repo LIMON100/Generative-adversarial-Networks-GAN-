@@ -62,35 +62,43 @@ void KalmanFilter::handleGPSMeasurement(GPSMeasurement meas)
         VectorXd state = getState();
         MatrixXd cov = getCovariance();
 
-        // Implement The Kalman Filter Update Step for the GPS Measurements in the 
-        // section below.
-        // Hint: Assume that the GPS sensor has a 3m (1 sigma) position uncertainty.
-        // Hint: You can use the constants: GPS_POS_STD
-        // ----------------------------------------------------------------------- //
-        // ENTER YOUR CODE HERE 
+        VectorXd z = Vector2d();
+        MatrixXd H = MatrixXd(2, 4);
+        MatrixXd R = Matrix2d::Zero();
 
+        z << meas.x, meas.y;
+        H << 1,0,0,0,0,1,0,0;
+        R(0,0) = GPS_POS_STD*GPS_POS_STD;
+        R(1,1) = GPS_POS_STD*GPS_POS_STD;
 
-        // ----------------------------------------------------------------------- //
+        VectorXd z_hat = H * state;
+        VectorXd y = z - z_hat;
+        MatrixXd S = H * cov * H.transpose() + R;
+        MatrixXd K = cov * H.transpose() * S.inverse();
+
+        state = state * K * y;
+        cov = (MatrixXd::Identity(4,4) - K*H) * cov;
 
         setState(state);
         setCovariance(cov);
     }
     else
     {
-        // Implement the State Vector and Covariance Matrix Initialisation in the
-        // section below. Make sure you call the setState/setCovariance functions
-        // once you have generated the initial conditions.
-        // Hint: Assume the state vector has the form [X,Y,VX,VY].
-        // Hint: You can use the constants: GPS_POS_STD, INIT_VEL_STD
-        // ----------------------------------------------------------------------- //
-        // ENTER YOUR CODE HERE
             VectorXd state = Vector4d::Zero();
             MatrixXd cov = Matrix4d::Zero();
 
 
+            state(0) = meas.x;
+            state(1) = meas.y;
+            cov(0,0) = GPS_POS_STD * GPS_POS_STD;
+            cov(1,1) = GPS_POS_STD * GPS_POS_STD;
+            cov(2,2) = INIT_VEL_STD * INIT_VEL_STD;
+            cov(3,3) = INIT_VEL_STD * INIT_VEL_STD;
+
+
             setState(state);
             setCovariance(cov);
-        // ----------------------------------------------------------------------- //
+
     }        
 }
 
