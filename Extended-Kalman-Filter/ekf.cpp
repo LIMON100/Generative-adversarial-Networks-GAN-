@@ -13,7 +13,6 @@ constexpr double LIDAR_THETA_STD = 0.02;
 
 void KalmanFilter::handleLidarMeasurements(const std::vector<LidarMeasurement>& dataset, const BeaconMap& map)
 {
-    // Assume No Correlation between the Measurements and Update Sequentially
     for(const auto& meas : dataset) {handleLidarMeasurement(meas, map);}
 }
 
@@ -23,24 +22,12 @@ void KalmanFilter::handleLidarMeasurement(LidarMeasurement meas, const BeaconMap
     {
         VectorXd state = getState();
         MatrixXd cov = getCovariance();
-
-        // Implement The Kalman Filter Update Step for the Lidar Measurements in the 
-        // section below.
-        // HINT: use the wrapAngle() function on angular values to always keep angle
-        // values within correct range, otherwise strange angle effects might be seen.
-        // HINT: You can use the constants: LIDAR_RANGE_STD, LIDAR_THETA_STD
-        // HINT: The mapped-matched beacon position can be accessed by the variables
-        // map_beacon.x and map_beacon.y
-        // ----------------------------------------------------------------------- //
-        // ENTER YOUR CODE HERE
-
-        BeaconData map_beacon = map.getBeaconWithId(meas.id); // Match Beacon with built in Data Association Id
+        BeaconData map_beacon = map.getBeaconWithId(meas.id); 
         if (meas.id != -1 && map_beacon.id != -1)
         {           
-            // The map matched beacon positions can be accessed using: map_beacon.x AND map_beacon.y
+           
         }
 
-        // ----------------------------------------------------------------------- //
 
         setState(state);
         setCovariance(cov);
